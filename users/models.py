@@ -1,7 +1,11 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import FileExtensionValidator
 from django.db.models import CharField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
+from django.db import models
+from utils.models import BaseModel
 
 
 class User(AbstractUser):
@@ -24,3 +28,26 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"username": self.username})
+
+
+class Profile(BaseModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE,
+                                related_name='profile')
+    subscribers = models.ManyToManyField('self', blank=True)
+    subscriptions = models.ManyToManyField('self', blank=True)
+
+    archive = models.ManyToManyField('ProfileHistory', blank=True)
+
+
+class ProfileImage(BaseModel):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE,
+                                related_name='images')
+    image = models.ImageField(upload_to='profile/image/')
+
+
+class ProfileHistory(BaseModel):
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE,
+                                   related_name='history')
+    video = models.FileField(upload_to='profile/video/', blank=True, null=True,
+                             validators=[FileExtensionValidator(['mp4', 'avi', 'mpeg'])])
+
