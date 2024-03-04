@@ -30,13 +30,40 @@ class User(AbstractUser):
         return reverse("users:detail", kwargs={"username": self.username})
 
 
+class GenderChoice(models.TextChoices):
+    MALE = 'Male'
+    FEMALE = 'Female',
+    CUSTOM = 'Custom',
+    NOT_SAY = 'Not say'
+
+
 class Profile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE,
                                 related_name='profile')
-    subscribers = models.ManyToManyField('self', blank=True)
-    subscriptions = models.ManyToManyField('self', blank=True)
+    followers = models.ManyToManyField('self', blank=True, through="Followers")
+    followings = models.ManyToManyField('self', blank=True, through="Followings")
 
     archive = models.ManyToManyField('ProfileHistory', blank=True)
+
+    about = models.CharField(max_length=150, blank=True, null=True)
+    gender = models.CharField(max_length=31, choices=GenderChoice.choices,
+                              default=GenderChoice.NOT_SAY)
+    custom = models.CharField(max_length=31, blank=True, null=True)
+
+    is_private = models.BooleanField(default=False)
+    is_recommendation = models.BooleanField(default=True)
+
+
+class Followers(BaseModel):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    follower = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    is_confirm = models.BooleanField(default=True)
+
+
+class Followings(BaseModel):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    following = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    is_confirm = models.BooleanField(default=True)
 
 
 class ProfileImage(BaseModel):
@@ -46,8 +73,8 @@ class ProfileImage(BaseModel):
 
 
 class ProfileHistory(BaseModel):
-    profile = models.OneToOneField(Profile, on_delete=models.CASCADE,
-                                   related_name='history')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE,
+                                related_name='histories')
     video = models.FileField(upload_to='profile/video/', blank=True, null=True,
                              validators=[FileExtensionValidator(['mp4', 'avi', 'mpeg'])])
-
+    is_active = models.BooleanField(default=True)

@@ -4,12 +4,27 @@ from django.db import models
 from utils.models import BaseModel
 
 
+class District(BaseModel):
+    title = models.CharField(max_length=31)
+    region = models.ForeignKey('self', on_delete=models.CASCADE,
+                               related_name='districts', blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+
 class Post(BaseModel):
     profile = models.ForeignKey('users.Profile', on_delete=models.CASCADE,
                                 related_name='posts')
     likes = models.ManyToManyField('users.Profile', related_name='liked_posts')
 
     content = models.CharField(max_length=511, blank=True, null=True)
+
+    is_comment = models.BooleanField(default=True)
+    is_show_likes = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.content
 
 
 class Media(BaseModel):
@@ -33,6 +48,5 @@ class Comment(BaseModel):
 
     content = models.CharField(max_length=511)
 
-'''
-example
-'''
+    def __str__(self):
+        return
