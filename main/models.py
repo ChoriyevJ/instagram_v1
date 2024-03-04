@@ -32,3 +32,7 @@ class Comment(BaseModel):
                                related_name='children')
 
     content = models.CharField(max_length=511)
+
+'''
+example
+'''
