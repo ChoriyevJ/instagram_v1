@@ -40,8 +40,8 @@ class GenderChoice(models.TextChoices):
 class Profile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE,
                                 related_name='profile')
-    followers = models.ManyToManyField('self', blank=True, through="Followers")
-    followings = models.ManyToManyField('self', blank=True, through="Followings")
+    followers = models.ManyToManyField('self', symmetrical=False, blank=True, through="Followers")
+    # followings = models.ManyToManyField('self', blank=True, through="Followings")
 
     archive = models.ManyToManyField('ProfileHistory', blank=True)
 
@@ -60,10 +60,10 @@ class Followers(BaseModel):
     is_confirm = models.BooleanField(default=True)
 
 
-class Followings(BaseModel):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    following = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    is_confirm = models.BooleanField(default=True)
+# class Followings(BaseModel):
+#     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+#     following = models.ForeignKey(Profile, on_delete=models.CASCADE)
+#     is_confirm = models.BooleanField(default=True)
 
 
 class ProfileImage(BaseModel):
