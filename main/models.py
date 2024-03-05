@@ -4,7 +4,7 @@ from django.db import models
 from utils.models import BaseModel
 
 
-class District(BaseModel):
+class Place(BaseModel):
     title = models.CharField(max_length=31)
     region = models.ForeignKey('self', on_delete=models.CASCADE,
                                related_name='districts', blank=True, null=True)
@@ -17,6 +17,8 @@ class Post(BaseModel):
     profile = models.ForeignKey('users.Profile', on_delete=models.CASCADE,
                                 related_name='posts')
     likes = models.ManyToManyField('users.Profile', related_name='liked_posts')
+    place = models.ForeignKey(Place, on_delete=models.CASCADE,
+                              related_name='posts')
 
     content = models.CharField(max_length=511, blank=True, null=True)
 
