@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from utils.models import BaseModel
 
+from users import managers
+
 
 class User(AbstractUser):
     """
@@ -40,41 +42,44 @@ class GenderChoice(models.TextChoices):
 class Profile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE,
                                 related_name='profile')
-    followers = models.ManyToManyField('self', symmetrical=False, blank=True, through="Followers")
-    # followings = models.ManyToManyField('self', blank=True, through="Followings")
-
-    archive = models.ManyToManyField('ProfileHistory', blank=True)
+    followers = models.ManyToManyField('self', symmetrical=False, blank=True,
+                                       related_name="followings")
+    confirms = models.ManyToManyField('self', symmetrical=False, blank=True,
+                                      through="Confirms")
 
     about = models.CharField(max_length=150, blank=True, null=True)
     gender = models.CharField(max_length=31, choices=GenderChoice.choices,
                               default=GenderChoice.NOT_SAY)
     custom = models.CharField(max_length=31, blank=True, null=True)
 
+    image = models.ImageField(upload_to='profile/images/', blank=True, null=True)
+
+    publication_count = models.PositiveIntegerField(default=0)
+
     is_private = models.BooleanField(default=False)
     is_recommendation = models.BooleanField(default=True)
 
+    profiles = managers.ProfileManager()
+    objects = models.Manager()
 
-class Followers(BaseModel):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    follower = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.user.username
+
+
+class Confirms(BaseModel):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE,
+                                related_name="confirm_followers")
+    follower = models.ForeignKey(Profile, on_delete=models.CASCADE,
+                                 related_name="confirm_profiles")
     is_confirm = models.BooleanField(default=True)
+    is_closer = models.BooleanField(default=False)
 
 
-# class Followings(BaseModel):
-#     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-#     following = models.ForeignKey(Profile, on_delete=models.CASCADE)
-#     is_confirm = models.BooleanField(default=True)
+class RelevantPosts(BaseModel):
+    title = models.CharField(max_length=31)
+    history = models.ManyToManyField('main.Post',
+                                     related_name='profiles')
 
 
-class ProfileImage(BaseModel):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE,
-                                related_name='images')
-    image = models.ImageField(upload_to='profile/image/')
 
 
-class ProfileHistory(BaseModel):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE,
-                                related_name='histories')
-    video = models.FileField(upload_to='profile/video/', blank=True, null=True,
-                             validators=[FileExtensionValidator(['mp4', 'avi', 'mpeg'])])
-    is_active = models.BooleanField(default=True)

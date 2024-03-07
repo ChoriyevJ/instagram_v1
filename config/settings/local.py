@@ -71,5 +71,13 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",  # noqa
+    },
+    'postgres': {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "instagram_v1",
+        "USER": "instagram_v1",
+        "PASSWORD": "instagram_v1",
+        "HOST": 'localhost',
+        "PORT": "5432",
     }
 }

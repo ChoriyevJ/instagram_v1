@@ -5,6 +5,7 @@ from django.contrib.auth import decorators, get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from users.forms import UserAdminChangeForm, UserAdminCreationForm
+from users import models
 
 User = get_user_model()
 
@@ -37,3 +38,20 @@ class UserAdmin(auth_admin.UserAdmin):
     )
     list_display = ["username", "name", "is_superuser"]
     search_fields = ["name"]
+
+
+@admin.register(models.Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'is_private', 'is_recommendation')
+    list_editable = ('is_private', 'is_recommendation')
+
+
+@admin.register(models.Confirms)
+class ConfirmsAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.RelevantPosts)
+class RelevantPostsAdmin(admin.ModelAdmin):
+    pass
+
