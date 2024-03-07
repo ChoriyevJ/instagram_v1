@@ -18,7 +18,23 @@ class FollowerFeedAPI(generics.ListAPIView):
         queryset = (super().get_queryset().filter(
             models.Q(followings__in=[self.request.user.profile]) |
             models.Q(pk=self.request.user.profile.pk)
-        ))
+        )).annotate(
+            is_watched=_.Coalesce(
+                models.Exists(
+                    self.request.user.profile.watching_posts.filter(
+                        pk=OuterRef('pk')
+                    )
+                ), False
+            )
+        )
+        # .prefetch_related(
+        #     Prefetch(
+        #         lookup="images",
+        #         queryset=ProfileImage.objects.all().values(
+        #             'image'
+        #         ).last()
+        #     )
+        # )
 
         return queryset
 
