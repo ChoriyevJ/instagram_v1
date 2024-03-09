@@ -1,5 +1,6 @@
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from ckeditor.fields import RichTextField
 
 from utils.models import BaseModel
 
@@ -38,7 +39,7 @@ class Post(BaseModel):
     saved = models.ManyToManyField('users.Profile', related_name='saved_posts', blank=True)
     watchers = models.ManyToManyField('users.Profile', related_name="watching_posts", blank=True)
 
-    content = models.CharField(max_length=511, blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
 
     type_public = models.CharField(max_length=31,
                                    choices=PublicTypeChoice.choices)

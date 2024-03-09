@@ -7,6 +7,10 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from utils.models import BaseModel
 
+from sorl.thumbnail import ImageField
+from imagekit.models import ImageSpecField, ProcessedImageField
+from imagekit.processors import ResizeToFill
+
 from users import managers
 
 
@@ -52,7 +56,18 @@ class Profile(BaseModel):
                               default=GenderChoice.NOT_SAY)
     custom = models.CharField(max_length=31, blank=True, null=True)
 
-    image = models.ImageField(upload_to='profile/images/', blank=True, null=True)
+    image = ImageField(upload_to='profile/images/', blank=True, null=True)
+    image2 = models.ImageField(upload_to="profile/images/", blank=True, null=True)
+    image2_thumbnail = ImageSpecField(source='image2',
+                                      processors=[ResizeToFill(100, 50)],
+                                      format='JPEG',
+                                      options={'quality': 60}
+                                      )
+    image3_thumbnail = ProcessedImageField(upload_to="profile/images/",
+                                           processors=[ResizeToFill(100, 50)],
+                                           format='JPEG',
+                                           options={'quality': 60}
+                                           )
 
     publication_count = models.PositiveIntegerField(default=0)
 

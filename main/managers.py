@@ -13,6 +13,13 @@ class PostAndReelsManager(models.Manager):
         )
         return queryset
 
+    def stories(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(
+            type_public=main_models.PublicTypeChoice.STORY
+        )
+        return queryset
+
 
 
 

@@ -1,0 +1,67 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <title>
+        {% block title %}
+        Chat
+        {% endblock title %}
+    </title>
+</head>
+<body>
+{% block content %}
+<div id="chat">
+</div>
+<div id="chat-input">
+    <input id="chat-message-input" type="text">
+    <input id="chat-message-submit" type="submit" value="Send">
+</div>
+{% endblock %}
+
+{% block include_js %}
+    {{ course_id|json_script:"course-id" }}
+{% endblock %}
+
+<script>
+const chatContainer = document.querySelector("#chat");
+const input = document.querySelector("#chat-message-input");
+const submitBtn= document.querySelector("#chat-message-submit");
+
+const courseId = JSON.parse(document.getElementById('course-id').textContent);
+const wsURL = `ws://${window.location.host}/ws/chat/room/${courseId}`
+const ws = new WebSocket(wsURL)
+
+ws.addEventListener("open", ()=>{
+alert("Room opened")
+})
+ws.addEventListener("message", (data)=>{
+console.log(data)
+// displayMessage(input.value)
+})
+ws.addEventListener("close", ()=>{
+alert("Room closed")
+})
+
+submitBtn.addEventListener("click", ()=>{
+ws.send(input.value)
+displayMessage(input.value)
+})
+
+const displayMessage =  (message) =>{
+chatContainer.innerHTML += message;
+}
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
